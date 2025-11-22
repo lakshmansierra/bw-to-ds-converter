@@ -10,6 +10,7 @@
 │   ├── upload_csv_route.py
 │   └── view_json_route.py
 ├── db_architecture
+│   └── db_architecture.png
 ├── models
 │   └── __init__.py
 ├── services
