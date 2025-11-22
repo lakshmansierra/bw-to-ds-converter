@@ -1,4 +1,4 @@
-# bw-to-datasphere-converter
+# bw-to-ds-converter
 
 ## project structure
 ```
