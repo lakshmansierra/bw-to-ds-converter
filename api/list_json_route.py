@@ -1,30 +1,27 @@
 import os
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
 from services.hana_service import get_db
+from models.schemas import APIResponse
 
 router = APIRouter()
 
-@router.get("/list_json")
+@router.get("/list_json", response_model=APIResponse)
 def list_json_file(conn = Depends(get_db)):
     try:
-        return JSONResponse(
+        response = APIResponse(
+            status="success",
             status_code=200,
-            content={
-                "status": "success",
-                "status_code": 200,
-                "message": f"",
-                "data": {},
-            },
+            message=f"",
+            data={}
+        ) 
+        
+    except Exception as e: 
+        response = APIResponse(
+            status="error",
+            status_code=500,
+            message=f"couldn't list files: {str(e)}",
+            data=None
         )
 
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "status_code": 500,
-                "message": f"couldn't list files: {str(e)}",
-                "data": None,
-            },
-        )
+    finally:
+        return response
