@@ -7,7 +7,7 @@ def csv_file_path(file_name: str) -> str:
     base_dir = os.path.join(project_root, "repositories", "csv_repos")
     os.makedirs(base_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    print(f"🐞 ts: {ts}")
+    print(f"ts: {ts}")
 
     dest_path = os.path.join(base_dir, f"{file_name}_{ts}")
     # os.makedirs(dest_path, exist_ok=True)
@@ -18,7 +18,7 @@ def json_file_path(file_name: str) -> str:
     base_dir = os.path.join(project_root, "repositories", "json_repos")
     os.makedirs(base_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    print(f"🐞 ts: {ts}")
+    print(f"ts: {ts}")
 
     dest_path = os.path.join(base_dir, f"{file_name}_{ts}")
     # os.makedirs(dest_path, exist_ok=True)
