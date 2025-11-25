@@ -24,15 +24,15 @@ def json_file_path(file_name: str) -> str:
     # os.makedirs(dest_path, exist_ok=True)
     return os.path.normpath(dest_path)
 
-def write_uploaded_file(csv_folder_path: str, uploaded_file, file_name_with_csv) -> None:
+def write_uploaded_file(csv_folder_path: str, content, file_name_with_csv) -> None:
     """
     Streams the uploaded file to disk without loading into memory.
     """
     try:
         os.makedirs(csv_folder_path, exist_ok=True)
         csv_full_path = os.path.join(csv_folder_path, file_name_with_csv)
-        with open(csv_full_path, "wb") as out_file:
-            shutil.copyfileobj(uploaded_file.file, out_file)
+        with open(csv_full_path, "wb") as f:
+            f.write(content)
     except Exception as e:
         print(f"Exception in write_uploaded_file: {e}")
         raise

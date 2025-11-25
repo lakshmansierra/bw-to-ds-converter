@@ -48,7 +48,7 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
         json_folder_path = json_file_path(file_name)
 
         # save file
-        write_uploaded_file(csv_folder_path, file, file_name_with_csv)
+        write_uploaded_file(csv_folder_path, content, file_name_with_csv)
 
         # insert into file_bw_to_ds
         inserted_id = insert_file_record(
