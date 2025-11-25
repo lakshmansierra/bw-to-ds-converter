@@ -1,7 +1,7 @@
 import os
 from datetime import date
 from services.hana_service import get_db
-from services.file_service import csv_file_path, json_file_path, write_uploaded_file
+from services.file_service import csv_file_path, json_file_path, write_uploaded_file, csv_to_2d_list, get_csv_full_path
 from services.hana_service import insert_file_record, insert_initial_conversion_run_status
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import JSONResponse
@@ -63,6 +63,10 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
         # insert initial run statuses (0) for conversion
         crs_id = insert_initial_conversion_run_status(conn, inserted_id)
 
+        # read the the csv as 2d list
+        csv_full_path = get_csv_full_path(csv_folder_path, file_name_with_csv)
+        csv_data = csv_to_2d_list(csv_full_path)
+
         return JSONResponse(
             status_code=200,
             content={
@@ -76,6 +80,7 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
                     "csv_folder_path": csv_folder_path,
                     "json_folder_path": json_folder_path,
                     "conversion_run_status_id": crs_id,
+                    "csv_data":csv_data
                 }
             }
         )
