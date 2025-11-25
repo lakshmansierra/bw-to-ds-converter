@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Optional
 import hdbcli.dbapi as dbapi
 from dotenv import load_dotenv
@@ -63,3 +63,88 @@ def get_db_from_ws(websocket: WebSocket):
 
 
 # -----------------------------------------------------------------------------------------------
+
+
+def insert_file_record(
+                        conn,
+                        *,
+                        csv: str,
+                        date: date,
+                        csv_path: str,
+                        json_path: str,
+                        state: int
+                    ) -> int:
+    """
+    Inserts a row into file_bw_to_ds table and returns the inserted id.
+    """
+    cursor = conn.cursor()
+    try:
+        query = f'''
+            INSERT INTO "{schema_name}"."file_bw_to_ds"
+              ("csv","date","csv_path","json_path","state")
+            VALUES (?,?,?,?,?)
+        '''
+        cursor.execute(query, [csv, date, csv_path, json_path, int(state)])
+        conn.commit()
+
+        # Retrieve inserted ID based on unique csv_path (timestamp inside path)
+        sel = f'''
+            SELECT A."id"
+            FROM "{schema_name}"."file_bw_to_ds" A
+            WHERE A."csv_path" = ?
+            ORDER BY A."id" DESC
+            LIMIT 1
+        '''
+        cursor.execute(sel, [csv_path])
+        row = cursor.fetchone()
+        print("👉", row)
+
+        # Close connection
+        cursor.close()
+        if row is None:
+            raise Exception("Insert succeeded but could not retrieve inserted id")
+        
+        row_val = row[0]
+        return int(row_val)
+
+    except Exception as e:
+        raise
+
+
+def insert_initial_conversion_run_status(conn, file_id: int) -> int:
+    """
+    Inserts a row into conversion_run_status_neo_to_cf with status=0 for the given file_id.
+    Returns the inserted id.
+    """
+    cursor = conn.cursor()
+    try:
+        ins = f'''
+            INSERT INTO "{schema_name}"."conversion_run_status_bw_to_ds"
+                ("file_id","conversion_run_status")
+            VALUES (?, 0)
+        '''
+        cursor.execute(ins, [int(file_id)])
+        conn.commit()
+
+        # Fetch the row we just inserted 
+        sel = f'''
+            SELECT "id", "file_id", "conversion_run_status"
+            FROM "{schema_name}"."conversion_run_status_bw_to_ds"
+            WHERE "file_id" = ?
+            ORDER BY "id" DESC
+            LIMIT 1
+        '''
+        cursor.execute(sel, [int(file_id)])
+        row = cursor.fetchone()
+        print("👉", row)
+
+        # Close connection
+        cursor.close()
+        if row is None:
+            raise Exception("Insert into conversion_run_status_bw_to_ds succeeded but could not retrieve inserted id")
+        
+        row_val = row[0]
+        return int(row_val)
+
+    except Exception as e:
+        raise

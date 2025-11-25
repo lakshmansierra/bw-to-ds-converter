@@ -1,27 +1,30 @@
 import os
-from fastapi import APIRouter, Depends
 from services.hana_service import get_db
-from models.schemas import APIResponse
+from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
-@router.get("/view_json", response_model=APIResponse)
+@router.get("/view_json")
 def view_json_file(conn = Depends(get_db)):
     try:
-        response = APIResponse(
-            status="success",
-            status_code=200,
-            message=f"",
-            data={}
-        ) 
-        
-    except Exception as e: 
-        response = APIResponse(
-            status="error",
-            status_code=500,
-            message=f"couldn't list files: {str(e)}",
-            data=None
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "status_code": 400,
+                "message": "Only .csv files are allowed",
+                "data": None
+            }
         )
 
-    finally:
-        return response
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "status_code": 500,
+                "message": f"Failed to upload CSV: {str(e)}",
+                "data": None
+            }
+        )
