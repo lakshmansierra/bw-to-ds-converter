@@ -1,5 +1,5 @@
 import os
-from services.hana_service import get_db
+from services.hana_service import get_db, fetch_files
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import JSONResponse
 
@@ -8,14 +8,15 @@ router = APIRouter()
 @router.get("/list_json")
 def list_json_file(conn = Depends(get_db)):
     try:
+        rows = fetch_files(conn)
         return JSONResponse(
-            status_code=400,
+            status_code=200,
             content={
-                "status": "error",
-                "status_code": 400,
-                "message": "Only .csv files are allowed",
-                "data": None
-            }
+                "status": "success",
+                "status_code": 200,
+                "message": f"fetched {len(rows)}",
+                "data": rows,
+            },
         )
 
     except Exception as e:
@@ -24,7 +25,7 @@ def list_json_file(conn = Depends(get_db)):
             content={
                 "status": "error",
                 "status_code": 500,
-                "message": f"Failed to upload CSV: {str(e)}",
-                "data": None
-            }
+                "message": f"couldn't fetch files: {str(e)}",
+                "data": None,
+            },
         )

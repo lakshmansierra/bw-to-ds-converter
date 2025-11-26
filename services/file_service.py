@@ -1,5 +1,4 @@
-import os, csv
-from urllib.parse import urlparse
+import os, csv, json
 from datetime import datetime
 
 def csv_file_path(file_name: str) -> str:
@@ -45,3 +44,22 @@ def csv_to_2d_list(csv_path: str):
         for row in reader:
             rows.append(row)
     return rows
+
+def json_file_generator(file_name_with_csv, json_file_path):
+    base_name, _ = os.path.splitext(file_name_with_csv)
+    json_filename = f"{base_name}.json"
+
+    json_file_full_path = os.path.join(json_file_path, json_filename)
+    return json_filename, json_file_full_path
+
+def read_json_file(abs_path: str) -> str:
+    try:
+        with open(abs_path, "r", encoding="utf-8", errors="ignore") as f:
+            read_file = json.load(f)
+        
+    except Exception as e:
+        print(f"Exception in read_json_file function: {e}")
+        read_file = ""
+    
+    finally:
+        return read_file

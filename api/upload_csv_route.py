@@ -53,7 +53,7 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
         # insert into file_bw_to_ds
         inserted_id = insert_file_record(
             conn,
-            csv=file_name,
+            csv=file_name_with_csv,
             date=uploaded_date,
             csv_path=csv_folder_path,
             json_path=json_folder_path,
