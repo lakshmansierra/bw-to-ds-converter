@@ -111,7 +111,7 @@ async def convert_csv_file(file_id: int, conn = Depends(get_db)):
             content={
                 "status": "error",
                 "status_code": 500,
-                "message": f"{str(e)}",
+                "message": f"Failed to convert CSV: {str(e)}",
                 "data": None,
             },
         )

@@ -71,7 +71,7 @@ def view_json_file(file_id: int, conn = Depends(get_db)):
             content={
                 "status": "error",
                 "status_code": 500,
-                "message": f"Failed to upload CSV: {str(e)}",
+                "message": f"Failed to view JSON: {str(e)}",
                 "data": None
             }
         )
