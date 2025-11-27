@@ -157,7 +157,7 @@ def get_state(conn, id: int) -> dict:
     cursor = conn.cursor()
     try:
         sel = f'''
-            SELECT "id", "state", "csv",
+            SELECT "id", "state", "csv"
             FROM "{schema_name}"."file_bw_to_ds"
             WHERE "id" = ?
             ORDER BY "id" DESC
@@ -193,7 +193,7 @@ def get_all_run_status(conn, file_id: int) -> dict:
     try:
         q = f'''
             SELECT
-                COALESCE(MRS."conversion_run_status", 0) AS conversion_run_status,
+                COALESCE(MRS."conversion_run_status", 0) AS conversion_run_status
             FROM "{schema_name}"."file_bw_to_ds" A
             LEFT JOIN "{schema_name}"."conversion_run_status_bw_to_ds" MRS
               ON MRS."file_id" = A."id"
@@ -222,7 +222,7 @@ def get_file_paths_or_404(conn, file_id: int) -> tuple[str | None, str | None]:
     cursor = conn.cursor()
     try:
         query = f'''
-            SELECT "csv_path", "json_path",
+            SELECT "csv_path", "json_path"
             FROM "{schema_name}"."file_bw_to_ds"
             WHERE "id" = ?
             ORDER BY "id" DESC
