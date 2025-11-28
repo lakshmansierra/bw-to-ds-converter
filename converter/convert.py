@@ -40,20 +40,25 @@ def run_pipeline(csv_file_path, json_file_path):
         "json3": json3
     })
     raw_content = getattr(response, "content", '{}')        
-    
+    # print(f"0----------> {type(raw_content)}")
     
     raw_content = re.sub(
         r'"expression"\s*:\s*""(.*?)""',
         r'"expression": "\"\1\""', 
         raw_content
     )
-  
+    # print(f"1----------> {type(raw_content)}")
+
     raw_content = re.sub(
     r'("expression"\s*:\s*".*?\()"?([^"]+)"?(\))',
     r'\1\"\2\"\3',
     raw_content
-)
-    parsed = raw_content
+    )
+    # print(f"2----------> {type(raw_content)}")
+
+    parsed = json.loads(raw_content)
+    # print(f"----------> {type(parsed)}")
+
     print(raw_content)
     try:
         write_json_file(json_file_path=json_file_path, content=parsed)
