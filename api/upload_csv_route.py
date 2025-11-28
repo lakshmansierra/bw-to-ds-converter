@@ -1,7 +1,7 @@
 import os
 from datetime import date
 from services.hana_service import get_db
-from services.file_service import csv_file_path, json_file_path, write_uploaded_file, csv_to_2d_list, get_csv_full_path
+from services.file_service import generate_csv_folder_path, generate_json_folder_path, generate_csv_file_path, write_csv_file, csv_to_2d_list, generate_csv_file_path
 from services.hana_service import insert_file_record, insert_initial_conversion_run_status
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import JSONResponse
@@ -42,13 +42,14 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
         uploaded_date =date.today()
 
         # get csv_folder_path
-        csv_folder_path = csv_file_path(file_name)
+        csv_folder_path = generate_csv_folder_path(file_name)
 
         # get json_folder_path
-        json_folder_path = json_file_path(file_name)
+        json_folder_path = generate_json_folder_path(file_name)
 
         # save file
-        write_uploaded_file(csv_folder_path, content, file_name_with_csv)
+        csv_file_path = generate_csv_file_path(csv_folder_path, file_name_with_csv)
+        write_csv_file(csv_file_path, content)
 
         # insert into file_bw_to_ds
         inserted_id = insert_file_record(
@@ -64,8 +65,7 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
         crs_id = insert_initial_conversion_run_status(conn, inserted_id)
 
         # read the the csv as 2d list
-        csv_full_path = get_csv_full_path(csv_folder_path, file_name_with_csv)
-        csv_data = csv_to_2d_list(csv_full_path)
+        csv_data = csv_to_2d_list(csv_file_path)
 
         return JSONResponse(
             status_code=200,
@@ -75,7 +75,7 @@ async def upload_csv_file(file: UploadFile = File(...), conn = Depends(get_db)):
                 "message": "CSV metadata saved successfully",
                 "data": {
                     "id": inserted_id,
-                    "csv": file_name,
+                    "csv": file_name_with_csv,
                     "date": uploaded_date.isoformat(),
                     "csv_folder_path": csv_folder_path,
                     "json_folder_path": json_folder_path,

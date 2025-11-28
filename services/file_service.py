@@ -1,65 +1,79 @@
 import os, csv, json
 from datetime import datetime
 
-def csv_file_path(file_name: str) -> str:
+def generate_csv_folder_path(file_name: str) -> str:
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     base_dir = os.path.join(project_root, "repositories", "csv_repos")
-    os.makedirs(base_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     print(f"ts: {ts}")
 
     dest_path = os.path.join(base_dir, f"{file_name}_{ts}")
-    # os.makedirs(dest_path, exist_ok=True)
+    os.makedirs(dest_path, exist_ok=True)
     return os.path.normpath(dest_path)
 
-def json_file_path(file_name: str) -> str:
+def generate_json_folder_path(file_name: str) -> str:
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     base_dir = os.path.join(project_root, "repositories", "json_repos")
-    os.makedirs(base_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     print(f"ts: {ts}")
 
     dest_path = os.path.join(base_dir, f"{file_name}_{ts}")
-    # os.makedirs(dest_path, exist_ok=True)
+    os.makedirs(dest_path, exist_ok=True)
     return os.path.normpath(dest_path)
 
-def get_csv_full_path(csv_folder_path, file_name_with_csv):
-    os.makedirs(csv_folder_path, exist_ok=True)
-    csv_full_path = os.path.join(csv_folder_path, file_name_with_csv)
-    return csv_full_path
+# ---------------------------------------
 
-def write_uploaded_file(csv_folder_path: str, content, file_name_with_csv) -> None:
+def generate_csv_file_path(csv_folder_path, file_name_with_csv):
+    os.makedirs(csv_folder_path, exist_ok=True)
+    csv_file_path = os.path.join(csv_folder_path, file_name_with_csv)
+    return csv_file_path
+
+def write_csv_file(csv_file_path: str, content) -> None:
     try:
-        csv_full_path = get_csv_full_path(csv_folder_path, file_name_with_csv)
-        with open(csv_full_path, "wb") as f:
+        with open(csv_file_path, "wb") as f:
             f.write(content)
     except Exception as e:
-        print(f"Exception in write_uploaded_file: {e}")
+        print(f"Exception in write_csv_file: {e}")
         raise
 
-def csv_to_2d_list(csv_path: str):
+# ---------------------------------------
+
+def generate_json_file_path(json_folder_path, file_name_with_json):
+    os.makedirs(json_folder_path, exist_ok=True)
+    json_file_path = os.path.join(json_folder_path, file_name_with_json)
+    return json_file_path
+
+def write_json_file(json_file_path: str, content) -> None:
+    try:
+        with open(json_file_path, "w", encoding="utf-8") as f:
+            json.dump(content, f, indent=4)
+    except Exception as e:
+        print(f"Exception in write_json_file: {e}")
+        raise
+
+# ---------------------------------------
+
+def csv_to_2d_list(csv_file_path: str):
     rows = []
-    with open(csv_path, "r", encoding="utf-8") as f:
+    with open(csv_file_path, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
         for row in reader:
             rows.append(row)
     return rows
 
-def json_file_generator(file_name_with_csv, json_file_path):
+def json_file_name_generator(file_name_with_csv):
     base_name, _ = os.path.splitext(file_name_with_csv)
-    json_filename = f"{base_name}.json"
+    file_name_with_json = f"{base_name}.json"
+    return file_name_with_json
 
-    json_file_full_path = os.path.join(json_file_path, json_filename)
-    return json_filename, json_file_full_path
-
-def read_json_file(abs_path: str) -> str:
+def read_json_file(json_file_path: str) -> str:
     try:
-        with open(abs_path, "r", encoding="utf-8", errors="ignore") as f:
-            read_file = json.load(f)
+        with open(json_file_path, "r", encoding="utf-8", errors="ignore") as f:
+            content = json.load(f)
         
     except Exception as e:
         print(f"Exception in read_json_file function: {e}")
-        read_file = ""
+        content = ""
     
     finally:
-        return read_file
+        return content

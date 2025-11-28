@@ -358,14 +358,17 @@ def fetch_files(conn):
     try:
         query = f'''
             SELECT 
-                "id",
-                "csv",
-                "date",
-                "csv_path",
-                "json_path",
-                "state"
-            FROM "{schema_name}"."file_bw_to_ds"
-            ORDER BY "id" DESC
+                f."id",
+                f."csv",
+                f."date",
+                f."csv_path",
+                f."json_path",
+                f."state",
+                crs."conversion_run_status"
+            FROM "{schema_name}"."file_bw_to_ds" f
+            LEFT JOIN "{schema_name}"."conversion_run_status_bw_to_ds" crs
+                ON f."id" = crs."file_id"
+            ORDER BY f."id" DESC
         '''
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -381,7 +384,8 @@ def fetch_files(conn):
                 "date": row[2].isoformat() if row[2] else None,
                 "csv_path": row[3],
                 "json_path": row[4],
-                "state": row[5]
+                "state": row[5],
+                "conversion_run_status": row[6]
             })
 
         return result

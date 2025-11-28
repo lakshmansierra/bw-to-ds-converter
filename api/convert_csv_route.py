@@ -2,6 +2,8 @@ import os
 import asyncio
 from datetime import datetime
 from services.hana_service import get_db, get_state, get_all_run_status, get_file_paths_or_404, set_conversion_run_status, insert_conversion_status, insert_state
+from services.file_service import generate_csv_file_path, generate_json_file_path, json_file_name_generator
+from converter.convert import run_pipeline
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import JSONResponse
 
@@ -11,6 +13,7 @@ router = APIRouter()
 async def convert_csv_file(file_id: int, conn = Depends(get_db)):
     try:
         state = get_state(conn, file_id)
+        file_name_with_csv = state["csv"]
         if not state["state"] == 0:
             return JSONResponse(
                 status_code=410,
@@ -40,14 +43,14 @@ async def convert_csv_file(file_id: int, conn = Depends(get_db)):
                 },
             )
 
-        csv_file_path, json_file_path = get_file_paths_or_404(conn, file_id)
-        if not csv_file_path or not os.path.isdir(csv_file_path):
+        csv_folder_path, json_folder_path = get_file_paths_or_404(conn, file_id)
+        if not csv_folder_path or not os.path.isdir(csv_folder_path):
             return JSONResponse(
                 status_code=404,
                 content={
                     "status": "error",
                     "status_code": 404,
-                    "message": f"Either csv_file_path not found in DB or csv_file_path is found in DB but not as a directory inside CF for file_id {file_id}",
+                    "message": f"Either csv_folder_path not found in DB or csv_folder_path is found in DB but not as a directory inside CF for file_id {file_id}",
                     "data": None,
                 },
             )
@@ -55,12 +58,16 @@ async def convert_csv_file(file_id: int, conn = Depends(get_db)):
         set_conversion_run_status(conn, file_id, 1)
         start_ts = datetime.utcnow()
 
-        result = await asyncio.to_thread(run_conversion, csv_file_path, json_file_path)
+        csv_file_path = generate_csv_file_path(csv_folder_path, file_name_with_csv)
+        file_name_with_json = json_file_name_generator(file_name_with_csv)
+        json_file_path = generate_json_file_path(json_folder_path, file_name_with_json)
+
+        result = await asyncio.to_thread(run_pipeline, csv_file_path, json_file_path)
 
         set_conversion_run_status(conn, file_id, 2)
         end_ts = datetime.utcnow()
 
-        converted_json = result.get("converted_json") or {}
+        converted_json = result or {}
 
         if not converted_json:
             inserted_log = insert_conversion_status(conn, file_id, start_ts, end_ts, status=0)
