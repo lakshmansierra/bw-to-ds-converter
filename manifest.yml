@@ -21,4 +21,4 @@ applications:
       AICORE_CLIENT_SECRET:  "b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU="
       AICORE_RESOURCE_GROUP:  "default"
       AICORE_BASE_URL: "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2"
-      LLM_DEPLOYMENT_ID: "dadede28a723f679"
+      LLM_DEPLOYMENT_ID: "d223bf19a092cfb3"
