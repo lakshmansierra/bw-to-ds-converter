@@ -1,0 +1,24 @@
+---
+applications:
+  - name: bw-to-ds-converter
+    memory: 2G
+    disk_quota: 3072M
+    instances: 1
+    random-route: true
+    buildpacks:
+      - python_buildpack
+    env:
+      PYTHONUNBUFFERED: 1
+      UVICORN_WORKERS: 2
+      HANA_HOST: fdddfefe-e600-4b7f-b032-4f8fd05ec060.hna0.prod-us10.hanacloud.ondemand.com
+      HANA_PORT: 443
+      HANA_USER: "AI_USE_CASES_HDI_DB_1_9YUM85CO7FKDBO5H0FRK2Q2VA_RT"
+      HANA_PASSWORD: Tn2FxjyBoXe6c.xQagv6lizP7SGgqd8ZSg4gmHGakSryuDH5vOAemDRqsr-jovT7Ov2c_oxC.tOHET1BrLuz895OMHYke_WJqlX_xSjA85.N0yjn.X5GZ.uo8L0pXH40
+      HANA_SCHEMA: AI_USE_CASES_HDI_DB_1
+    
+      AICORE_AUTH_URL: "https://gen-ai.authentication.us10.hana.ondemand.com/oauth/token"
+      AICORE_CLIENT_ID:  "sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164"
+      AICORE_CLIENT_SECRET:  "b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU="
+      AICORE_RESOURCE_GROUP:  "default"
+      AICORE_BASE_URL: "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2"
+      LLM_DEPLOYMENT_ID: "d223bf19a092cfb3"
